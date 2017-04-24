@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServlet;
 
+import com.sleightholme.jfs.util.InvalidFileTypeException;
+
 /**
  * 
  */
@@ -14,49 +16,29 @@ import javax.servlet.http.HttpServlet;
  */
 public class JFSServlet extends ExtendedServlet {
 
-	protected PrintWriter out;	
-	protected String title = "";
-	
-	public void setTitle(String title){
-		this.title = title;
-	}
-	
-	public String getTitle(){
-		return title;
-	}
-	
-	/**
-	 * Prints out the head including title of the HTML
-	 */
-	public void doHeader(){
+	public void doHeader(String...imports){
 		preHeader();
-		out.println("<title>" + title + "</title>");
+		printTitle();
+		imports(imports);
 		postHeader();
+		
 	}
 	
 	/**
-	 * Prints out the opening html tags
+	 * Imports CSS or Javascript to be added to the page
+	 * No other filetypes can currently be imported
+	 * @param imports
 	 */
-	protected void preHeader(){
-		out.println("<html>");
-		out.println("<head>");
+	protected void imports(String...imports){
+		for (String imported : imports){
+			if (imported.endsWith(".css")){
+				out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +imported +"\">");
+			} else if (imported.endsWith(".js")){
+				 out.println("<script src=\"" + imported + "\"></script>"); 
+			} else {
+				throw new InvalidFileTypeException("Only .css or .js files can be imported");
+			}
+			
+		}
 	}
-	
-	/**
-	 * Prints out the end of the head and the start of the body
-	 */
-	protected void postHeader(){
-		out.println("</head>");
-		out.println("<body>");
-	}
-	
-	/**
-	 * Prints out the end of body and html tags
-	 */
-	public void doFooter(){
-		out.println("</body>");
-		out.println("</html>");
-	}
-	
-	
 }
